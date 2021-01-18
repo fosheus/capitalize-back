@@ -1,9 +1,8 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
 import com.albanj.capitalize.capitalizeback.dao.ApplicationUserRepository;
-import com.albanj.capitalize.capitalizeback.model.ApplicationUser;
+import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

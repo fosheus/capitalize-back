@@ -1,7 +1,7 @@
 package com.albanj.capitalize.capitalizeback.resource;
 
 import com.albanj.capitalize.capitalizeback.dao.ApplicationUserRepository;
-import com.albanj.capitalize.capitalizeback.model.ApplicationUser;
+import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,4 +27,6 @@ public class UserController {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         applicationUserRepository.save(user);
     }
+
+
 }

@@ -1,6 +1,6 @@
 package com.albanj.capitalize.capitalizeback.security.filter;
 
-import com.albanj.capitalize.capitalizeback.model.ApplicationUser;
+import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 
