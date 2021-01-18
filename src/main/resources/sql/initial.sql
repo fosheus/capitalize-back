@@ -1,0 +1,1 @@
+INSERT INTO profile(label) VALUES ('USER'),('ADMIN');
