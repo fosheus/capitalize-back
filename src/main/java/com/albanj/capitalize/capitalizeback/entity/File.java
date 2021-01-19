@@ -15,7 +15,6 @@ public class File extends AbstractEntity{
     private String name;
     @Column(nullable = false)
     private String path;
-    @Column(nullable = false)
     private String fullPath;
     private String type;
     @ManyToOne(fetch = FetchType.LAZY)

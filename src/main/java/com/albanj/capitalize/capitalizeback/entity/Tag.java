@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
+@Table(indexes = {@Index(name="IDX_TAG" ,columnList = "label,post_id",unique = true)})
 public class Tag extends AbstractEntity{
 
     @Id
