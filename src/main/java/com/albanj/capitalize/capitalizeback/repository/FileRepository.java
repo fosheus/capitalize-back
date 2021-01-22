@@ -1,4 +1,4 @@
-package com.albanj.capitalize.capitalizeback.dao;
+package com.albanj.capitalize.capitalizeback.repository;
 
 import com.albanj.capitalize.capitalizeback.entity.File;
 import org.springframework.data.jpa.repository.JpaRepository;

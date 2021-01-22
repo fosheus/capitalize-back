@@ -13,7 +13,6 @@ import java.util.List;
 @Data
 public class PostDto implements Serializable {
 
-
     private Integer id;
     private String title;
     private String text;

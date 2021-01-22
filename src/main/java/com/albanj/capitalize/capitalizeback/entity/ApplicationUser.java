@@ -3,8 +3,9 @@ package com.albanj.capitalize.capitalizeback.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @Data
 @Entity
@@ -13,9 +14,10 @@ public class ApplicationUser extends AbstractEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(unique = true ,nullable = false)
-    @Pattern(regexp = "/^([\\S\\d\\w]+)@((.+\\.[\\S\\d\\w]{2,})|((?:[0-9]{1,3}\\.){3}[0-9]{1,3}))$")
+    @Email @NotNull
     private String email;
     @Column(unique = true,nullable = false)
+    @NotNull
     private String username;
     @NotNull
     private String password;

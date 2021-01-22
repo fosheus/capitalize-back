@@ -1,8 +1,10 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
-import com.albanj.capitalize.capitalizeback.dao.FileRepository;
-import com.albanj.capitalize.capitalizeback.dao.PostRepository;
-import com.albanj.capitalize.capitalizeback.dao.TagTypeRepository;
+import com.albanj.capitalize.capitalizeback.mapper.PostMapper;
+import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
+import com.albanj.capitalize.capitalizeback.repository.FileRepository;
+import com.albanj.capitalize.capitalizeback.repository.PostRepository;
+import com.albanj.capitalize.capitalizeback.repository.TagTypeRepository;
 import com.albanj.capitalize.capitalizeback.dto.FileDto;
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
 import com.albanj.capitalize.capitalizeback.dto.TagDto;
@@ -12,8 +14,6 @@ import com.albanj.capitalize.capitalizeback.entity.RefTagType;
 import com.albanj.capitalize.capitalizeback.entity.Tag;
 import com.albanj.capitalize.capitalizeback.exception.BadRequestException;
 import com.albanj.capitalize.capitalizeback.exception.NotFoundException;
-import com.albanj.capitalize.capitalizeback.mapper.PostMapper;
-import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
 import com.albanj.capitalize.capitalizeback.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -77,8 +77,8 @@ public class PostServiceImpl implements PostService {
 
         Post p = post.get();
         PostDto dto = postMapper.toDto(p);
-        dto.setOwner(userMapper.toDto(p.getOwner()));
-        dto.setValidator(userMapper.toDto(p.getValidator()));
+        dto.setOwner(userMapper.map(p.getOwner()));
+        dto.setValidator(userMapper.map(p.getValidator()));
 
         for (File file : p.getFiles()) {
             String content = Files.readString(Paths.get(file.getFullPath()));

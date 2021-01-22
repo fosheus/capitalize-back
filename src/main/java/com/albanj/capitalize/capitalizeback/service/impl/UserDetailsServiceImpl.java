@@ -1,8 +1,9 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
-import com.albanj.capitalize.capitalizeback.dao.ApplicationUserRepository;
+import com.albanj.capitalize.capitalizeback.repository.ApplicationUserRepository;
 import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.*;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -29,7 +30,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (applicationUser == null) {
             throw new UsernameNotFoundException(username);
         }
-        User user = new User(applicationUser.getUsername(),applicationUser.getPassword(), Collections.singleton(applicationUser.getProfile()));
+        Set<GrantedAuthority> authorities = null;
+        if (applicationUser.getProfile() != null) {
+            authorities =  Collections.singleton(applicationUser.getProfile());
+         } else {
+            authorities = new HashSet<>();
+        }
+
+        User user = new User(applicationUser.getUsername(),applicationUser.getPassword(),authorities);
         return user;
     }
 }
