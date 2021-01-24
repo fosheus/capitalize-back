@@ -17,7 +17,7 @@ public class Tag extends AbstractEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="post_id")
     private Post post;
-    @ManyToOne(fetch = FetchType.EAGER)
+   /* @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="ref_tag_type_id")
-    private RefTagType type;
+    private RefTagType type;*/
 }

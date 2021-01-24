@@ -20,6 +20,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    public ProfileDto getOneById(Integer id) {
+        return modelMapper.map(profileRepository.getOne(id),ProfileDto.class);
+    }
+
+    @Override
     public ProfileDto getOneByLabel(String label) {
         return modelMapper.map(profileRepository.findOneByLabel(label),ProfileDto.class);
     }

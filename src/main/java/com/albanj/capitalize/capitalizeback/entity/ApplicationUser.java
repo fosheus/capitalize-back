@@ -22,8 +22,8 @@ public class ApplicationUser extends AbstractEntity {
     @NotNull
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="profile_id")
+    @ManyToOne(fetch = FetchType.LAZY,cascade = {})
+    @JoinColumn(name="profile_id",insertable = false,updatable = false)
     @NotNull
     private RefProfile profile;
 }

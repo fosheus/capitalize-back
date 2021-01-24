@@ -1,8 +1,5 @@
 package com.albanj.capitalize.capitalizeback.dto;
 
-import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
-import com.albanj.capitalize.capitalizeback.entity.File;
-import com.albanj.capitalize.capitalizeback.entity.Tag;
 import lombok.Data;
 
 import java.io.Serializable;

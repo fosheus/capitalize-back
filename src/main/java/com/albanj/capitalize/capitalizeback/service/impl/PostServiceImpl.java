@@ -1,5 +1,6 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
+import com.albanj.capitalize.capitalizeback.form.PostForm;
 import com.albanj.capitalize.capitalizeback.mapper.PostMapper;
 import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
 import com.albanj.capitalize.capitalizeback.repository.FileRepository;
@@ -15,12 +16,14 @@ import com.albanj.capitalize.capitalizeback.entity.Tag;
 import com.albanj.capitalize.capitalizeback.exception.BadRequestException;
 import com.albanj.capitalize.capitalizeback.exception.NotFoundException;
 import com.albanj.capitalize.capitalizeback.service.PostService;
+import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,31 +41,33 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
-    private final UserMapper userMapper;
     private final TagTypeRepository tagTypeRepository;
     private final FileRepository fileRepository;
     private final Environment env;
+    private final UserService userService;
+
+    private final String FILE_PATH;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, PostMapper postMapper, UserMapper userMapper, TagTypeRepository tagTypeRepository, FileRepository fileRepository, Environment env) {
+    public PostServiceImpl(PostRepository postRepository, TagTypeRepository tagTypeRepository, FileRepository fileRepository, Environment env, UserService userService) {
         this.postRepository = postRepository;
-        this.postMapper = postMapper;
-        this.userMapper = userMapper;
         this.tagTypeRepository = tagTypeRepository;
         this.fileRepository = fileRepository;
         this.env = env;
+        this.userService = userService;
+        FILE_PATH = env.getProperty("capitalize.files.path");
+
     }
 
     @Override
-    public List<PostDto> getAll(Integer page, Integer size,List<String> tags) {
-        Page<Post> posts= null;
+    public List<PostDto> getAll(Integer page, Integer size, List<String> tags) throws IOException {
+        Page<Post> posts = null;
         if (tags.isEmpty()) {
-            posts = postRepository.findAll(getPageable(page,size,"updatedAt",false));
-        }else {
-            posts = postRepository.findAllByTags(getPageable(page,size,"updatedAt",false),tags);
+            posts = postRepository.findAll(getPageable(page, size, "updatedAt", false));
+        } else {
+            posts = postRepository.findAllByTags(getPageable(page, size, "updatedAt", false), tags);
         }
-        return posts.map(postMapper::toDto).toList();
+        return PostMapper.map(posts.getContent());
     }
 
 
@@ -76,60 +81,26 @@ public class PostServiceImpl implements PostService {
         }
 
         Post p = post.get();
-        PostDto dto = postMapper.toDto(p);
-        dto.setOwner(userMapper.map(p.getOwner()));
-        dto.setValidator(userMapper.map(p.getValidator()));
 
-        for (File file : p.getFiles()) {
-            String content = Files.readString(Paths.get(file.getFullPath()));
-            FileDto fileDto = new FileDto();
-            fileDto.setId(file.getId());
-            fileDto.setPath(file.getPath());
-            fileDto.setType(file.getType());
-            fileDto.setContent(content);
-            dto.getFiles().add(fileDto);
-        }
-        for (Tag tag : p.getTags()) {
-            TagDto tagDto = new TagDto();
-            tagDto.setId(tag.getId());
-            tagDto.setLabel(tag.getLabel());
-            if(tag.getType()!=null) {
-                tagDto.setType(tag.getType().getLabel());
-            }
-        }
-
-        return dto;
+        return PostMapper.map(p);
     }
 
     @Override
-    public List<PostDto> getAllUnvalidated(Integer page, Integer size) {
-        List<Post> posts= postRepository.findByValidationDateNull(getPageable(page,size,"updatedAt",false));
-        return posts.stream().map(postMapper::toDto).collect(Collectors.toList());
+    public List<PostDto> getAllUnvalidated(Integer page, Integer size) throws IOException {
+        List<Post> posts = postRepository.findByValidationDateNull(getPageable(page, size, "updatedAt", false));
+        return PostMapper.map(posts);
     }
 
     @Override
-    public PostDto create(PostDto postDto) throws Exception {
-        if (postDto.getId() != null) {
+    public PostDto create(Authentication authentication, PostForm postForm) throws Exception {
+
+        if (postForm.getId() != null) {
             throw new Exception();
         }
-        String filePath = env.getProperty("capitalize.files.path");
-        List<RefTagType> refTagTypes= tagTypeRepository.findAll();
-        Post post = postMapper.toEntity(postDto);
-        Set<Tag> tags = new HashSet<>();
-        for (TagDto t : postDto.getTags()) {
-            Tag tag = new Tag();
-            tag.setPost(post);
-            tag.setLabel(t.getLabel());
-            Optional<RefTagType> refTagType = refTagTypes.stream().filter(rtt->rtt.getLabel().equals(t.getLabel())).findAny();
-            if (refTagType.isEmpty()) {
-                throw new NotFoundException();
-            }
-            tag.setType(refTagType.get());
-            tags.add(tag);
-        }
-        post.setTags(new HashSet<>(tags));
+        List<RefTagType> refTagTypes = tagTypeRepository.findAll();
+        Post post = PostMapper.map(postForm, FILE_PATH);
         Set<File> files = new HashSet<>();
-        for (FileDto f : postDto.getFiles()) {
+        for (FileDto f : postForm.getFiles()) {
             File file = new File();
             try {
                 Paths.get(f.getPath());
@@ -147,19 +118,37 @@ public class PostServiceImpl implements PostService {
             files.add(file);
         }
         post.setFiles(new HashSet<>(files));
+        authentication.getName();
         post = postRepository.save(post);
         for (File f : post.getFiles()) {
-            f.setFullPath(Paths.get(filePath,String.valueOf(post.getId()),f.getPath()).toString());
+            f.setFullPath(Paths.get(FILE_PATH, String.valueOf(post.getId()), f.getPath()).toString());
         }
         fileRepository.saveAll(post.getFiles());
-        return postMapper.toDto(postRepository.save(post));
+        return PostMapper.map(postRepository.save(post));
     }
 
-    private Pageable getPageable(Integer page, Integer size, String sort,boolean ascending) {
-        if (page ==null) {
-            page =0;
+    @Override
+    public PostDto update(Integer id, PostForm postForm) {
+        if (postForm == null || id == null || !id.equals(postForm.getId())) {
+            throw new BadRequestException();
         }
-        if (size==null) {
+
+        Post post = PostMapper.map(postForm,FILE_PATH);
+
+        return null;
+    }
+
+    @Override
+    public PostDto validate(Authentication authentication, Integer id) {
+
+        return null;
+    }
+
+    private Pageable getPageable(Integer page, Integer size, String sort, boolean ascending) {
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
             size = 10;
         }
         Pageable pageable = null;
@@ -169,9 +158,9 @@ public class PostServiceImpl implements PostService {
             if (!ascending) {
                 sortBy.descending();
             }
-            pageable=PageRequest.of(page,size, sortBy);
+            pageable = PageRequest.of(page, size, sortBy);
         } else {
-            pageable=PageRequest.of(page,size);
+            pageable = PageRequest.of(page, size);
         }
         return pageable;
     }

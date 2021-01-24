@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
 @Data
 public class Post extends AbstractEntity{
@@ -26,10 +27,8 @@ public class Post extends AbstractEntity{
     private ApplicationUser validator;
     private LocalDateTime validationDate;
 
-
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Tag> tags = new HashSet<>();
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<File> files = new HashSet<>();
 }
