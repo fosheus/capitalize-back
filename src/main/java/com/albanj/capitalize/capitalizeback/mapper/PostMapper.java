@@ -18,7 +18,7 @@ public class PostMapper {
         Post post = new Post();
         post.setId(postDto.getId());
         post.setTitle(postDto.getTitle());
-        post.setText(postDto.getText());
+        post.setDescription(postDto.getDescription());
         post.setFiles(FileMapper.map(postDto.getFiles(),postDto.getId(),fileLocation));
         post.setTags(TagMapper.map(postDto.getTags()));
         return post;
@@ -29,7 +29,7 @@ public class PostMapper {
         Post post = new Post();
         post.setId(postForm.getId());
         post.setTitle(postForm.getTitle());
-        post.setText(postForm.getText());
+        post.setDescription(postForm.getDescription());
         post.setFiles(FileMapper.map(postForm.getFiles(),postForm.getId(),fileLocation));
         post.setTags(TagMapper.map(postForm.getTags()));
         return post;
@@ -39,7 +39,7 @@ public class PostMapper {
         PostDto dto = new PostDto();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
-        dto.setText(post.getText());
+        dto.setDescription(post.getDescription());
         dto.setValidated(post.getValidationDate() != null);
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUpdatedAt(post.getUpdatedAt());

@@ -8,8 +8,10 @@ import com.albanj.capitalize.capitalizeback.validator.groups.ValidationOnRequest
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,6 +63,8 @@ public class PostController {
     public PostDto validate(Authentication authentication,@PathVariable Integer id) {
         return postService.validate(authentication,id);
     }
+
+
 
 
 }

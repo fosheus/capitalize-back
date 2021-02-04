@@ -1,6 +1,7 @@
 package com.albanj.capitalize.capitalizeback.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 public class Post extends AbstractEntity{
@@ -18,7 +20,7 @@ public class Post extends AbstractEntity{
     @Column(columnDefinition = "varchar(255)",nullable = false)
     private String title;
     @Column(columnDefinition = "mediumtext",nullable = false)
-    private String text;
+    private String description;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="owner_id")
     private ApplicationUser owner;

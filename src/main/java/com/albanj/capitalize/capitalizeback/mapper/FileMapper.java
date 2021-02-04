@@ -13,11 +13,10 @@ import java.util.stream.Collectors;
 
 public class FileMapper {
 
-    public static FileDto map(File file) throws IOException {
+    public static FileDto map(File file) {
         if( file == null) return null;
         FileDto dto = new FileDto();
         dto.setId(file.getId());
-        dto.setContent(Files.readString(Path.of(file.getFullPath())));
         dto.setName(file.getName());
         dto.setPath(file.getPath());
         dto.setType(file.getType());

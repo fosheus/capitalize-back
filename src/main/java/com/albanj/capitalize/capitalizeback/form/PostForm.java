@@ -16,7 +16,7 @@ public class PostForm {
 
     private Integer id;
     private String title;
-    private String text;
+    private String description;
     private List<TagDto> tags = new ArrayList<>();
     private List< @FileDtoValidation(groups=ValidationOnRequest.class) FileDto> files = new ArrayList<>();
 }

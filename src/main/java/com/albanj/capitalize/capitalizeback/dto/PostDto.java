@@ -12,7 +12,7 @@ public class PostDto implements Serializable {
 
     private Integer id;
     private String title;
-    private String text;
+    private String description;
     private LocalDateTime validationDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

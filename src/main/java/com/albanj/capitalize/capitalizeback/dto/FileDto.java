@@ -11,5 +11,5 @@ public class FileDto implements Serializable {
     private String path;
     private String name;
     private String type;
-    private String content;
+    //private String content;
 }

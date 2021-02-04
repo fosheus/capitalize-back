@@ -31,7 +31,7 @@ public class UserMapper {
         return dto;
     }
 
-    public ApplicationUser map(UserSignupForm userSignupForm) {
+    public static ApplicationUser map(UserSignupForm userSignupForm) {
         if (userSignupForm == null) return null;
         ApplicationUser user = new ApplicationUser();
         user.setUsername(userSignupForm.getUsername());
@@ -41,7 +41,7 @@ public class UserMapper {
         return user;
     }
 
-    public ApplicationUser map(UserUpdateForm form) {
+    public static ApplicationUser map(UserUpdateForm form) {
         if (form == null ) return null;
         ApplicationUser user = new ApplicationUser();
         user.setUsername(form.getUsername());

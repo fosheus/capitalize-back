@@ -1,9 +1,11 @@
 package com.albanj.capitalize.capitalizeback.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
+@EqualsAndHashCode(exclude = "post", callSuper = false)
 @Entity
 @Data
 public class File extends AbstractEntity{

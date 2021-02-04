@@ -1,12 +1,14 @@
 package com.albanj.capitalize.capitalizeback.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 public class ApplicationUser extends AbstractEntity {

@@ -20,15 +20,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final ApplicationUserRepository repo;
-    private final UserMapper mapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ProfileRepository profileRepository;
 
 
     @Autowired
-    public UserServiceImpl(ApplicationUserRepository repo, UserMapper mapper, BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
+    public UserServiceImpl(ApplicationUserRepository repo,BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
         this.repo = repo;
-        this.mapper = mapper;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.profileRepository = profileRepository;
     }
@@ -36,11 +34,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserSignupForm userSignupForm) {
 
-        ApplicationUser user = mapper.map(userSignupForm);
+        ApplicationUser user = UserMapper.map(userSignupForm);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         RefProfile profile = profileRepository.findOneByLabel(ProfileEnum.USER.name());
         user.setProfile(profile);
-        return mapper.map(repo.save(user));
+        return UserMapper.map(repo.save(user));
     }
 
     @Override
@@ -49,7 +47,7 @@ public class UserServiceImpl implements UserService {
         if (user.isEmpty()) {
             throw new NotFoundException();
         }
-        return mapper.map(user.get());
+        return UserMapper.map(user.get());
     }
 
     @Override
@@ -64,6 +62,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getOneByEmailOrUsername(String email, String username) {
         ApplicationUser user = repo.findByEmailOrUsername(email,username);
-        return mapper.map(user);
+        return UserMapper.map(user);
     }
 }
