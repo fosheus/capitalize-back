@@ -1,5 +1,6 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
+import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
 import com.albanj.capitalize.capitalizeback.mapper.PostMapper;
 import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
@@ -8,13 +9,11 @@ import com.albanj.capitalize.capitalizeback.repository.PostRepository;
 import com.albanj.capitalize.capitalizeback.repository.TagTypeRepository;
 import com.albanj.capitalize.capitalizeback.dto.FileDto;
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
-import com.albanj.capitalize.capitalizeback.dto.TagDto;
 import com.albanj.capitalize.capitalizeback.entity.File;
 import com.albanj.capitalize.capitalizeback.entity.Post;
 import com.albanj.capitalize.capitalizeback.entity.RefTagType;
-import com.albanj.capitalize.capitalizeback.entity.Tag;
-import com.albanj.capitalize.capitalizeback.exception.BadRequestException;
-import com.albanj.capitalize.capitalizeback.exception.NotFoundException;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeNotFoundException;
 import com.albanj.capitalize.capitalizeback.service.PostService;
 import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +22,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -62,7 +60,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDto> getAll(Integer page, Integer size, List<String> tags) throws IOException {
         Page<Post> posts = null;
-        if (tags.isEmpty()) {
+        if (CollectionUtils.isEmpty(tags)) {
             posts = postRepository.findAll(getPageable(page, size, "updatedAt", false));
         } else {
             posts = postRepository.findAllByTags(getPageable(page, size, "updatedAt", false), tags);
@@ -77,11 +75,9 @@ public class PostServiceImpl implements PostService {
 
         Optional<Post> post = postRepository.findById(id);
         if (post.isEmpty()) {
-            throw new NotFoundException();
+            throw new CapitalizeNotFoundException();
         }
-
         Post p = post.get();
-
         return PostMapper.map(p);
     }
 
@@ -92,7 +88,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto create(Authentication authentication, PostForm postForm) throws Exception {
+    public PostDto create(UserDto user, PostForm postForm) throws Exception {
 
         if (postForm.getId() != null) {
             throw new Exception();
@@ -105,11 +101,11 @@ public class PostServiceImpl implements PostService {
             try {
                 Paths.get(f.getPath());
             } catch (InvalidPathException ex) {
-                throw new BadRequestException("Le chemin de fichier [" + f.getPath() + "] est incorrect");
+                throw new CapitalizeBadRequestException("Le chemin de fichier [" + f.getPath() + "] est incorrect");
             }
 
             if (f.getPath().contains("..")) {
-                throw new BadRequestException("Le chemin de fichier [" + f.getPath() + "] ne peut pas contenir le caractère [..]");
+                throw new CapitalizeBadRequestException("Le chemin de fichier [" + f.getPath() + "] ne peut pas contenir le caractère [..]");
             }
             file.setPath(f.getPath());
             file.setName(f.getName());
@@ -118,7 +114,7 @@ public class PostServiceImpl implements PostService {
             files.add(file);
         }
         post.setFiles(new HashSet<>(files));
-        authentication.getName();
+        post.setOwner(UserMapper.map(user));
         post = postRepository.save(post);
         for (File f : post.getFiles()) {
             f.setFullPath(Paths.get(FILE_PATH, String.valueOf(post.getId()), f.getPath()).toString());
@@ -130,7 +126,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto update(Integer id, PostForm postForm) {
         if (postForm == null || id == null || !id.equals(postForm.getId())) {
-            throw new BadRequestException();
+            throw new CapitalizeBadRequestException();
         }
 
         Post post = PostMapper.map(postForm,FILE_PATH);
@@ -139,9 +135,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto validate(Authentication authentication, Integer id) {
+    public PostDto validate(UserDto userDto, Integer id) {
 
-        return null;
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (optionalPost.isEmpty()) {
+            throw  new CapitalizeNotFoundException();
+        }
+        Post post = optionalPost.get();
+        post.setValidationDate(LocalDateTime.now());
+        post.setValidator(UserMapper.map(userDto));
+        return PostMapper.map(postRepository.save(post));
     }
 
     private Pageable getPageable(Integer page, Integer size, String sort, boolean ascending) {

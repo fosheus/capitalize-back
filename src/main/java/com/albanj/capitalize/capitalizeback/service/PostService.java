@@ -1,6 +1,7 @@
 package com.albanj.capitalize.capitalizeback.service;
 
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
+import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,10 @@ public interface PostService {
 
     List<PostDto> getAll(Integer page, Integer size,List<String> tags) throws IOException;
 
-    PostDto create(Authentication authentication, PostForm post) throws Exception;
+    PostDto create(UserDto userDto, PostForm post) throws Exception;
 
     PostDto update(Integer id,PostForm post);
 
-    PostDto validate(Authentication authentication, Integer id);
+    PostDto validate(UserDto userDto, Integer id) ;
 
 }

@@ -33,4 +33,9 @@ public class TagMapper {
         if (CollectionUtils.isEmpty(dtos)) return Collections.emptySet();
         return dtos.stream().map(TagMapper::map).collect(Collectors.toSet());
     }
+
+    public static List<TagDto> map(Set<Tag> dtos) {
+        if (CollectionUtils.isEmpty(dtos)) return Collections.emptyList();
+        return dtos.stream().map(TagMapper::map).collect(Collectors.toList());
+    }
 }

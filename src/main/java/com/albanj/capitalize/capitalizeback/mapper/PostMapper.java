@@ -35,7 +35,7 @@ public class PostMapper {
         return post;
     }
 
-    public static PostDto map(Post post) throws IOException {
+    public static PostDto map(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
@@ -45,6 +45,9 @@ public class PostMapper {
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setValidationDate(post.getValidationDate());
         dto.setFiles(FileMapper.map(post.getFiles()));
+        dto.setTags(TagMapper.map(post.getTags()));
+        dto.setOwner(UserMapper.map(post.getOwner()));
+        dto.setValidator(UserMapper.map(post.getValidator()));
         return dto;
     }
 

@@ -1,17 +1,17 @@
 package com.albanj.capitalize.capitalizeback.resource;
 
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
-import com.albanj.capitalize.capitalizeback.exception.BadRequestException;
+import com.albanj.capitalize.capitalizeback.dto.UserDto;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
 import com.albanj.capitalize.capitalizeback.service.PostService;
+import com.albanj.capitalize.capitalizeback.service.UserService;
 import com.albanj.capitalize.capitalizeback.validator.groups.ValidationOnRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,13 +21,15 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final UserService userService;
 
     @Autowired
-    public PostController(PostService postService) {
+    public PostController(PostService postService, UserService userService) {
         this.postService = postService;
+        this.userService = userService;
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public List<PostDto> list(@RequestParam(required = false) List<String> tags,@RequestParam(required=false) Integer page, @RequestParam(required = false) Integer size) throws IOException {
         return postService.getAll(page,size,tags);
     }
@@ -38,7 +40,7 @@ public class PostController {
         try {
             idInt = Integer.parseInt(id);
         }catch (NumberFormatException e){
-            throw new BadRequestException("L'identifiant n'est pas au format entier");
+            throw new CapitalizeBadRequestException("L'identifiant n'est pas au format entier");
         }
         return postService.getOne(idInt);
     }
@@ -51,7 +53,8 @@ public class PostController {
 
     @PostMapping("/")
     public PostDto create(Authentication authentication, @RequestBody @Validated(ValidationOnRequest.class) PostForm post) throws Exception {
-        return postService.create(authentication,post);
+        UserDto user = this.userService.getOneByEmailOrUsername(null,authentication.getName());
+        return postService.create(user,post);
     }
 
     @PutMapping("/{id}")
@@ -61,7 +64,8 @@ public class PostController {
 
     @PatchMapping("/{id}/validate")
     public PostDto validate(Authentication authentication,@PathVariable Integer id) {
-        return postService.validate(authentication,id);
+        UserDto user = this.userService.getOneByEmailOrUsername(null,authentication.getName());
+        return postService.validate(user,id);
     }
 
 

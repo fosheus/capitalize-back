@@ -4,12 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value= HttpStatus.NOT_FOUND)
-public class NotFoundException extends RuntimeException {
+public class CapitalizeNotFoundException extends RuntimeException {
 
-    public NotFoundException() {
+    public CapitalizeNotFoundException() {
     }
 
-    public NotFoundException(String message) {
+    public CapitalizeNotFoundException(String message) {
         super(message);
     }
 }

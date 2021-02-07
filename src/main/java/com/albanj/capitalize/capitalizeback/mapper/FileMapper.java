@@ -39,7 +39,7 @@ public class FileMapper {
         return dtos.stream().map(dto->FileMapper.map(dto,postId,fileLocation)).collect(Collectors.toSet());
     }
 
-    public static List<FileDto> map(Set<File> files) throws IOException {
+    public static List<FileDto> map(Set<File> files)  {
         List<FileDto> dtos=new ArrayList<>();
         if (CollectionUtils.isEmpty(files)) return dtos;
         for (File file : files) {

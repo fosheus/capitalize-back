@@ -4,7 +4,7 @@ import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import com.albanj.capitalize.capitalizeback.entity.RefProfile;
 import com.albanj.capitalize.capitalizeback.enums.ProfileEnum;
-import com.albanj.capitalize.capitalizeback.exception.NotFoundException;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeNotFoundException;
 import com.albanj.capitalize.capitalizeback.form.UserSignupForm;
 import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
 import com.albanj.capitalize.capitalizeback.repository.ApplicationUserRepository;
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getOne(Integer id) {
         Optional<ApplicationUser> user = repo.findById(id);
         if (user.isEmpty()) {
-            throw new NotFoundException();
+            throw new CapitalizeNotFoundException();
         }
         return UserMapper.map(user.get());
     }
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     public void delete(Integer id) {
         Optional<ApplicationUser> user = repo.findById(id);
         if (user.isEmpty()) {
-            throw new NotFoundException();
+            throw new CapitalizeNotFoundException();
         }
         repo.deleteById(id);
     }

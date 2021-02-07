@@ -1,5 +1,6 @@
 package com.albanj.capitalize.capitalizeback.security;
 
+import com.albanj.capitalize.capitalizeback.properties.CorsProperties;
 import com.albanj.capitalize.capitalizeback.security.filter.JWTAuthenticationFilter;
 import com.albanj.capitalize.capitalizeback.security.filter.JWTAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 import static com.albanj.capitalize.capitalizeback.security.SecurityConstants.SIGN_UP_URL;
 
@@ -48,13 +52,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
+        CorsProperties corsProperties = new CorsProperties();
         config.addExposedHeader("Authorization, x-xsrf-token, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, "
                 + "Content-Type, Access-Control-Request-Method, Custom-Filter-Header");
-        config.addAllowedHeader("*");
-
+        config.setAllowedMethods(Arrays.asList("PUT","DELETE","GET","POST","PATCH"));
         source.registerCorsConfiguration("/**", config);
         return source;
     }
