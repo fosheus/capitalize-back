@@ -47,7 +47,8 @@ public class PostServiceImpl implements PostService {
     private final String FILE_PATH;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, TagTypeRepository tagTypeRepository, FileRepository fileRepository, Environment env, UserService userService) {
+    public PostServiceImpl(PostRepository postRepository, TagTypeRepository tagTypeRepository,
+            FileRepository fileRepository, Environment env, UserService userService) {
         this.postRepository = postRepository;
         this.tagTypeRepository = tagTypeRepository;
         this.fileRepository = fileRepository;
@@ -67,7 +68,6 @@ public class PostServiceImpl implements PostService {
         }
         return PostMapper.map(posts.getContent());
     }
-
 
     @Override
     @Transactional
@@ -105,7 +105,8 @@ public class PostServiceImpl implements PostService {
             }
 
             if (f.getPath().contains("..")) {
-                throw new CapitalizeBadRequestException("Le chemin de fichier [" + f.getPath() + "] ne peut pas contenir le caractère [..]");
+                throw new CapitalizeBadRequestException(
+                        "Le chemin de fichier [" + f.getPath() + "] ne peut pas contenir le caractère [..]");
             }
             file.setPath(f.getPath());
             file.setName(f.getName());
@@ -129,7 +130,7 @@ public class PostServiceImpl implements PostService {
             throw new CapitalizeBadRequestException();
         }
 
-        Post post = PostMapper.map(postForm,FILE_PATH);
+        Post post = PostMapper.map(postForm, FILE_PATH);
 
         return null;
     }
@@ -139,7 +140,7 @@ public class PostServiceImpl implements PostService {
 
         Optional<Post> optionalPost = postRepository.findById(id);
         if (optionalPost.isEmpty()) {
-            throw  new CapitalizeNotFoundException();
+            throw new CapitalizeNotFoundException();
         }
         Post post = optionalPost.get();
         post.setValidationDate(LocalDateTime.now());
@@ -167,6 +168,5 @@ public class PostServiceImpl implements PostService {
         }
         return pageable;
     }
-
 
 }

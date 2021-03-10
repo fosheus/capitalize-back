@@ -4,12 +4,12 @@ import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import com.albanj.capitalize.capitalizeback.form.UserSignupForm;
 import com.albanj.capitalize.capitalizeback.form.UserUpdateForm;
-import org.springframework.stereotype.Component;
 
 public class UserMapper {
 
     public static ApplicationUser map(UserDto userDto) {
-        if (userDto==null)return null;
+        if (userDto == null)
+            return null;
         ApplicationUser entity = new ApplicationUser();
         entity.setId(userDto.getId());
         entity.setUsername(userDto.getUsername());
@@ -20,7 +20,8 @@ public class UserMapper {
     }
 
     public static UserDto map(ApplicationUser user) {
-        if (user == null) return null;
+        if (user == null)
+            return null;
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
@@ -32,7 +33,8 @@ public class UserMapper {
     }
 
     public static ApplicationUser map(UserSignupForm userSignupForm) {
-        if (userSignupForm == null) return null;
+        if (userSignupForm == null)
+            return null;
         ApplicationUser user = new ApplicationUser();
         user.setUsername(userSignupForm.getUsername());
         user.setEmail(userSignupForm.getEmail());
@@ -42,7 +44,8 @@ public class UserMapper {
     }
 
     public static ApplicationUser map(UserUpdateForm form) {
-        if (form == null ) return null;
+        if (form == null)
+            return null;
         ApplicationUser user = new ApplicationUser();
         user.setUsername(form.getUsername());
         user.setEmail(form.getEmail());

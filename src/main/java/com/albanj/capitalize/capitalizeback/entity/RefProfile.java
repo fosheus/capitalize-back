@@ -7,8 +7,12 @@ import javax.persistence.*;
 
 @Entity
 @Data
-public class RefProfile implements GrantedAuthority  {
+public class RefProfile implements GrantedAuthority {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3867612184315497296L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

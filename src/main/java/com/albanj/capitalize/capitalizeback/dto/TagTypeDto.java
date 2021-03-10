@@ -1,6 +1,5 @@
 package com.albanj.capitalize.capitalizeback.dto;
 
-
 import lombok.Data;
 
 @Data

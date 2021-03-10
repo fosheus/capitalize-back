@@ -2,13 +2,12 @@ package com.albanj.capitalize.capitalizeback.dto;
 
 import lombok.Data;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class PostDto implements Serializable {
+public class PostDto {
 
     private Integer id;
     private String title;
