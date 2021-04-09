@@ -1,21 +1,28 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import com.albanj.capitalize.capitalizeback.dto.PostDto;
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
+import com.albanj.capitalize.capitalizeback.entity.File;
+import com.albanj.capitalize.capitalizeback.entity.Post;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeNotFoundException;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
 import com.albanj.capitalize.capitalizeback.mapper.PostMapper;
 import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
 import com.albanj.capitalize.capitalizeback.repository.FileRepository;
 import com.albanj.capitalize.capitalizeback.repository.PostRepository;
 import com.albanj.capitalize.capitalizeback.repository.TagTypeRepository;
-import com.albanj.capitalize.capitalizeback.dto.FileDto;
-import com.albanj.capitalize.capitalizeback.dto.PostDto;
-import com.albanj.capitalize.capitalizeback.entity.File;
-import com.albanj.capitalize.capitalizeback.entity.Post;
-import com.albanj.capitalize.capitalizeback.entity.RefTagType;
-import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
-import com.albanj.capitalize.capitalizeback.exception.CapitalizeNotFoundException;
 import com.albanj.capitalize.capitalizeback.service.PostService;
 import com.albanj.capitalize.capitalizeback.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -26,16 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 @Service
+@Transactional
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
@@ -70,7 +69,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Transactional
     public PostDto getOne(Integer id) throws IOException {
 
         Optional<Post> post = postRepository.findById(id);
@@ -93,28 +91,7 @@ public class PostServiceImpl implements PostService {
         if (postForm.getId() != null) {
             throw new Exception();
         }
-        List<RefTagType> refTagTypes = tagTypeRepository.findAll();
         Post post = PostMapper.map(postForm, FILE_PATH);
-        Set<File> files = new HashSet<>();
-        for (FileDto f : postForm.getFiles()) {
-            File file = new File();
-            try {
-                Paths.get(f.getPath());
-            } catch (InvalidPathException ex) {
-                throw new CapitalizeBadRequestException("Le chemin de fichier [" + f.getPath() + "] est incorrect");
-            }
-
-            if (f.getPath().contains("..")) {
-                throw new CapitalizeBadRequestException(
-                        "Le chemin de fichier [" + f.getPath() + "] ne peut pas contenir le caractère [..]");
-            }
-            file.setPath(f.getPath());
-            file.setName(f.getName());
-            file.setType(f.getType());
-            file.setPost(post);
-            files.add(file);
-        }
-        post.setFiles(new HashSet<>(files));
         post.setOwner(UserMapper.map(user));
         post = postRepository.save(post);
         for (File f : post.getFiles()) {
@@ -129,10 +106,17 @@ public class PostServiceImpl implements PostService {
         if (postForm == null || id == null || !id.equals(postForm.getId())) {
             throw new CapitalizeBadRequestException();
         }
+        Optional<Post> optPost = postRepository.findById(id);
+        Post post = null;
+        if (optPost.isEmpty()) {
+            throw new CapitalizeNotFoundException();
+        }
+        post = optPost.get();
 
-        Post post = PostMapper.map(postForm, FILE_PATH);
+        post = PostMapper.map(postForm, post, FILE_PATH);
+        post.setUpdatedAt(LocalDateTime.now());
+        return PostMapper.map(postRepository.save(post));
 
-        return null;
     }
 
     @Override

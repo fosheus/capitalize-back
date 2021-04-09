@@ -1,14 +1,12 @@
 package com.albanj.capitalize.capitalizeback.validator.Profile;
 
-import com.albanj.capitalize.capitalizeback.validator.UserSignupForm.UserSignupFormValidator;
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
-@Target({ElementType.FIELD})
+@Target({ ElementType.FIELD })
 @Documented
-@Constraint(validatedBy = {ProfileValidator.class})
+@Constraint(validatedBy = { ProfileValidator.class })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProfileValidation {
 

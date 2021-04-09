@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.albanj.capitalize.capitalizeback.dto.FileDto;
 import com.albanj.capitalize.capitalizeback.entity.File;
+import com.albanj.capitalize.capitalizeback.entity.Post;
 
 import org.springframework.util.CollectionUtils;
 
@@ -25,22 +26,25 @@ public class FileMapper {
         return dto;
     }
 
-    public static File map(FileDto dto, Integer postId, String fileLocation) {
-        if (dto == null || postId == null || fileLocation == null)
+    public static File map(FileDto dto, Post post, String fileLocation) {
+        if (dto == null || fileLocation == null)
             return null;
         File file = new File();
         file.setId(dto.getId());
         file.setName(dto.getName());
         file.setPath(dto.getPath());
         file.setType(dto.getType());
-        file.setFullPath(Paths.get(fileLocation, String.valueOf(postId), dto.getPath()).toString());
+        if (post != null && post.getId() != null) {
+            file.setFullPath(Paths.get(fileLocation, String.valueOf(post.getId()), dto.getPath()).toString());
+        }
+        file.setPost(post);
         return file;
     }
 
-    public static Set<File> map(List<FileDto> dtos, Integer postId, String fileLocation) {
-        if (CollectionUtils.isEmpty(dtos) || postId == null || fileLocation == null)
+    public static Set<File> map(List<FileDto> dtos, Post post, String fileLocation) {
+        if (CollectionUtils.isEmpty(dtos) || post == null || post.getId() == null || fileLocation == null)
             return Collections.emptySet();
-        return dtos.stream().map(dto -> FileMapper.map(dto, postId, fileLocation)).collect(Collectors.toSet());
+        return dtos.stream().map(dto -> FileMapper.map(dto, post, fileLocation)).collect(Collectors.toSet());
     }
 
     public static List<FileDto> map(Set<File> files) {

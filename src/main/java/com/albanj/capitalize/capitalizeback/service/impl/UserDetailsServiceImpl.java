@@ -14,13 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
+@Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private ApplicationUserRepository applicationUserRepository;
 
     @Autowired
     public UserDetailsServiceImpl(ApplicationUserRepository applicationUserRepository) {
-        this.applicationUserRepository=applicationUserRepository;
+        this.applicationUserRepository = applicationUserRepository;
     }
 
     @Override
@@ -32,12 +33,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         Set<GrantedAuthority> authorities = null;
         if (applicationUser.getProfile() != null) {
-            authorities =  Collections.singleton(applicationUser.getProfile());
-         } else {
+            authorities = Collections.singleton(applicationUser.getProfile());
+        } else {
             authorities = new HashSet<>();
         }
 
-        User user = new User(applicationUser.getUsername(),applicationUser.getPassword(),authorities);
+        User user = new User(applicationUser.getUsername(), applicationUser.getPassword(), authorities);
         return user;
     }
 }

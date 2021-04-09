@@ -13,25 +13,35 @@ import java.util.List;
 @Component
 public class PostMapper {
 
-    public static Post map(PostDto postDto,String fileLocation) {
-        if (postDto == null) return null;
+    public static Post map(PostDto postDto, String fileLocation) {
+        if (postDto == null)
+            return null;
         Post post = new Post();
         post.setId(postDto.getId());
         post.setTitle(postDto.getTitle());
         post.setDescription(postDto.getDescription());
-        post.setFiles(FileMapper.map(postDto.getFiles(),postDto.getId(),fileLocation));
-        post.setTags(TagMapper.map(postDto.getTags()));
+        post.getFiles().addAll(FileMapper.map(postDto.getFiles(), post, fileLocation));
+        post.getTags().addAll(TagMapper.map(postDto.getTags(), post));
         return post;
     }
 
     public static Post map(PostForm postForm, String fileLocation) {
-        if (postForm == null) return null;
-        Post post = new Post();
-        post.setId(postForm.getId());
+        return PostMapper.map(postForm, new Post(), fileLocation);
+    }
+
+    public static Post map(PostForm postForm, Post post, String fileLocation) {
+        if (postForm == null)
+            return null;
+        if (post == null) {
+            post = new Post();
+            post.setId(postForm.getId());
+        }
         post.setTitle(postForm.getTitle());
         post.setDescription(postForm.getDescription());
-        post.setFiles(FileMapper.map(postForm.getFiles(),postForm.getId(),fileLocation));
-        post.setTags(TagMapper.map(postForm.getTags()));
+        post.getFiles().clear();
+        post.getTags().clear();
+        post.getFiles().addAll(FileMapper.map(postForm.getFiles(), post, fileLocation));
+        post.getTags().addAll(TagMapper.map(postForm.getTags(), post));
         return post;
     }
 
@@ -53,8 +63,9 @@ public class PostMapper {
 
     public static List<PostDto> map(List<Post> posts) throws IOException {
         List<PostDto> dtos = new ArrayList<>();
-        if (CollectionUtils.isEmpty(posts)) return dtos;
-        for( Post post : posts) {
+        if (CollectionUtils.isEmpty(posts))
+            return dtos;
+        for (Post post : posts) {
             dtos.add(PostMapper.map(post));
         }
         return dtos;

@@ -6,8 +6,10 @@ import com.albanj.capitalize.capitalizeback.service.ProfileService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
@@ -21,11 +23,11 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileDto getOneById(Integer id) {
-        return modelMapper.map(profileRepository.getOne(id),ProfileDto.class);
+        return modelMapper.map(profileRepository.getOne(id), ProfileDto.class);
     }
 
     @Override
     public ProfileDto getOneByLabel(String label) {
-        return modelMapper.map(profileRepository.findOneByLabel(label),ProfileDto.class);
+        return modelMapper.map(profileRepository.findOneByLabel(label), ProfileDto.class);
     }
 }

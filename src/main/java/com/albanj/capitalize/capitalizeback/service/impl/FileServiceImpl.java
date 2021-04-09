@@ -9,6 +9,7 @@ import com.albanj.capitalize.capitalizeback.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class FileServiceImpl implements FileService {
 
     private final FileRepository repo;

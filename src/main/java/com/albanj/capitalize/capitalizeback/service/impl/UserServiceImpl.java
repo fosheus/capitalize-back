@@ -13,19 +13,21 @@ import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final ApplicationUserRepository repo;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ProfileRepository profileRepository;
 
-
     @Autowired
-    public UserServiceImpl(ApplicationUserRepository repo,BCryptPasswordEncoder bCryptPasswordEncoder, ProfileRepository profileRepository) {
+    public UserServiceImpl(ApplicationUserRepository repo, BCryptPasswordEncoder bCryptPasswordEncoder,
+            ProfileRepository profileRepository) {
         this.repo = repo;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.profileRepository = profileRepository;
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getOneByEmailOrUsername(String email, String username) {
-        ApplicationUser user = repo.findByEmailOrUsername(email,username);
+        ApplicationUser user = repo.findByEmailOrUsername(email, username);
         return UserMapper.map(user);
     }
 }

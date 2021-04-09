@@ -1,15 +1,11 @@
 package com.albanj.capitalize.capitalizeback.service;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-
-import java.awt.print.Pageable;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
 
 public interface PostService {
 
@@ -17,12 +13,12 @@ public interface PostService {
 
     List<PostDto> getAllUnvalidated(Integer page, Integer size) throws IOException;
 
-    List<PostDto> getAll(Integer page, Integer size,List<String> tags) throws IOException;
+    List<PostDto> getAll(Integer page, Integer size, List<String> tags) throws IOException;
 
     PostDto create(UserDto userDto, PostForm post) throws Exception;
 
-    PostDto update(Integer id,PostForm post);
+    PostDto update(Integer id, PostForm post);
 
-    PostDto validate(UserDto userDto, Integer id) ;
+    PostDto validate(UserDto userDto, Integer id);
 
 }
