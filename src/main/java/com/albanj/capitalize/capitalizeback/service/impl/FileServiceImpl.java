@@ -50,7 +50,7 @@ public class FileServiceImpl implements FileService {
             throw new CapitalizeNotFoundException();
         }
         File file = optionalFile.get();
-        if (!file.getType().equals(FileTypeEnum.BINARY.name())) {
+        if (!file.getType().equals(FileTypeEnum.OTHER.name())) {
             throw new CapitalizeBadRequestException();
         }
         return Files.readAllBytes(Paths.get(file.getFullPath()));
