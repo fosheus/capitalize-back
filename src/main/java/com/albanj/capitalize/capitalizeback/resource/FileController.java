@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -22,18 +21,15 @@ public class FileController {
     }
 
     @GetMapping("/{id}/text")
-    public FileContentDto getFileTextContent(Authentication authentication, @PathVariable Integer id) throws IOException {
+    public FileContentDto getFileTextContent(Authentication authentication, @PathVariable Integer id)
+            throws IOException {
         return new FileContentDto(fileService.getFileTextContent(id));
     }
 
-    @GetMapping(value= "/{id}/binary",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] getFileBinaryContent(Authentication authentication, @PathVariable Integer id) throws IOException {
+    @GetMapping(value = "/{id}/binary", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] getFileBinaryContent(Authentication authentication, @PathVariable Integer id)
+            throws IOException {
         byte[] array = fileService.getFileBinaryContent(id);
         return array;
-    }
-
-    @PutMapping("/{id}/{path}")
-    public void updateFile(Authentication authentication, @PathVariable Integer id, @PathVariable Integer fileId,@PathVariable String path, @RequestParam MultipartFile file) {
-         fileService.updateFile(authentication,file,fileId,path);
     }
 }

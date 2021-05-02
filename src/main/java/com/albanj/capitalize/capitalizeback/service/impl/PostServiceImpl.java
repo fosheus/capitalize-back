@@ -4,56 +4,60 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import com.albanj.capitalize.capitalizeback.dto.FileDto;
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.entity.File;
 import com.albanj.capitalize.capitalizeback.entity.Post;
+import com.albanj.capitalize.capitalizeback.enums.FileTypeEnum;
+import com.albanj.capitalize.capitalizeback.enums.ProfileEnum;
 import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
+import com.albanj.capitalize.capitalizeback.exception.CapitalizeForbiddenException;
 import com.albanj.capitalize.capitalizeback.exception.CapitalizeNotFoundException;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
+import com.albanj.capitalize.capitalizeback.mapper.FileMapper;
 import com.albanj.capitalize.capitalizeback.mapper.PostMapper;
 import com.albanj.capitalize.capitalizeback.mapper.UserMapper;
 import com.albanj.capitalize.capitalizeback.repository.FileRepository;
 import com.albanj.capitalize.capitalizeback.repository.PostRepository;
 import com.albanj.capitalize.capitalizeback.repository.TagTypeRepository;
+import com.albanj.capitalize.capitalizeback.service.FileService;
 import com.albanj.capitalize.capitalizeback.service.PostService;
 import com.albanj.capitalize.capitalizeback.service.UserService;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
 
-    private final PostRepository postRepository;
-    private final TagTypeRepository tagTypeRepository;
+    private final PostRepository repo;
     private final FileRepository fileRepository;
-    private final Environment env;
-    private final UserService userService;
-
-    private final String FILE_PATH;
+    private final FileService fileService;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, TagTypeRepository tagTypeRepository,
-            FileRepository fileRepository, Environment env, UserService userService) {
-        this.postRepository = postRepository;
-        this.tagTypeRepository = tagTypeRepository;
+    public PostServiceImpl(PostRepository repo, FileRepository fileRepository, FileService fileService) {
+        this.repo = repo;
         this.fileRepository = fileRepository;
-        this.env = env;
-        this.userService = userService;
-        FILE_PATH = env.getProperty("capitalize.files.path");
+        this.fileService = fileService;
 
     }
 
@@ -61,9 +65,9 @@ public class PostServiceImpl implements PostService {
     public List<PostDto> getAll(Integer page, Integer size, List<String> tags) throws IOException {
         Page<Post> posts = null;
         if (CollectionUtils.isEmpty(tags)) {
-            posts = postRepository.findAll(getPageable(page, size, "updatedAt", false));
+            posts = repo.findAll(getPageable(page, size, "updatedAt", false));
         } else {
-            posts = postRepository.findAllByTags(getPageable(page, size, "updatedAt", false), tags);
+            posts = repo.findAllByTags(getPageable(page, size, "updatedAt", false), tags);
         }
         return PostMapper.map(posts.getContent());
     }
@@ -71,17 +75,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto getOne(Integer id) throws IOException {
 
-        Optional<Post> post = postRepository.findById(id);
-        if (post.isEmpty()) {
-            throw new CapitalizeNotFoundException();
-        }
-        Post p = post.get();
-        return PostMapper.map(p);
+        Post post = repo.findById(id).orElseThrow(() -> new CapitalizeNotFoundException());
+        return PostMapper.map(post);
     }
 
     @Override
     public List<PostDto> getAllUnvalidated(Integer page, Integer size) throws IOException {
-        List<Post> posts = postRepository.findByValidationDateNull(getPageable(page, size, "updatedAt", false));
+        List<Post> posts = repo.findByValidationDateNull(getPageable(page, size, "updatedAt", false));
         return PostMapper.map(posts);
     }
 
@@ -91,45 +91,39 @@ public class PostServiceImpl implements PostService {
         if (postForm.getId() != null) {
             throw new Exception();
         }
-        Post post = PostMapper.map(postForm, FILE_PATH);
+        Post post = PostMapper.map(postForm, this.fileService.getFileSavePath());
         post.setOwner(UserMapper.map(user));
-        post = postRepository.save(post);
-        for (File f : post.getFiles()) {
-            f.setFullPath(Paths.get(FILE_PATH, String.valueOf(post.getId()), f.getPath()).toString());
-        }
-        fileRepository.saveAll(post.getFiles());
-        return PostMapper.map(postRepository.save(post));
+        /*
+         * post = repo.save(post); for (File f : post.getFiles()) {
+         * f.setFullPath(Paths.get(FILE_PATH, String.valueOf(post.getId()),
+         * f.getPath()).toString()); } fileRepository.saveAll(post.getFiles());
+         */
+        return PostMapper.map(repo.save(post));
     }
 
     @Override
-    public PostDto update(Integer id, PostForm postForm) {
+    public PostDto update(UserDto userDto, Integer id, PostForm postForm) {
         if (postForm == null || id == null || !id.equals(postForm.getId())) {
             throw new CapitalizeBadRequestException();
         }
-        Optional<Post> optPost = postRepository.findById(id);
-        Post post = null;
-        if (optPost.isEmpty()) {
-            throw new CapitalizeNotFoundException();
-        }
-        post = optPost.get();
+        Post post = repo.findById(id).orElseThrow(() -> new CapitalizeNotFoundException());
 
-        post = PostMapper.map(postForm, post, FILE_PATH);
+        this.checkUserHasRightOrThrowForbidden(userDto, post,
+                Arrays.asList(ProfileEnum.ADMIN.name(), ProfileEnum.ARCHITECT.name()));
+
+        post = PostMapper.map(postForm, post, this.fileService.getFileSavePath());
         post.setUpdatedAt(LocalDateTime.now());
-        return PostMapper.map(postRepository.save(post));
+        return PostMapper.map(repo.save(post));
 
     }
 
     @Override
     public PostDto validate(UserDto userDto, Integer id) {
 
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isEmpty()) {
-            throw new CapitalizeNotFoundException();
-        }
-        Post post = optionalPost.get();
+        Post post = repo.findById(id).orElseThrow(() -> new CapitalizeNotFoundException());
         post.setValidationDate(LocalDateTime.now());
         post.setValidator(UserMapper.map(userDto));
-        return PostMapper.map(postRepository.save(post));
+        return PostMapper.map(repo.save(post));
     }
 
     private Pageable getPageable(Integer page, Integer size, String sort, boolean ascending) {
@@ -151,6 +145,70 @@ public class PostServiceImpl implements PostService {
             pageable = PageRequest.of(page, size);
         }
         return pageable;
+    }
+
+    @Override
+    public void deleteFile(UserDto userDto, Integer postId, List<Integer> fileIds) {
+
+        final boolean isAdminOrArchitect = this.isAdminOrArchitect(userDto);
+
+        List<File> files = fileIds.stream()
+                .map(f -> this.fileRepository.findById(f).orElseThrow(() -> new CapitalizeNotFoundException()))
+                .collect(Collectors.toList());
+
+        files.stream().forEach(f -> {
+            if (f.getPost() == null || f.getPost().getId() != postId) {
+                throw new CapitalizeBadRequestException();
+            }
+            if (!f.getPost().getOwner().getUsername().equals(userDto.getUsername()) && !isAdminOrArchitect) {
+                throw new CapitalizeForbiddenException();
+            }
+        });
+
+        this.fileService.deleteFiles(files);
+    }
+
+    private boolean isAdminOrArchitect(UserDto user) {
+        return user.getProfile().getLabel().equals(ProfileEnum.ARCHITECT.name())
+                || user.getProfile().getLabel().equals(ProfileEnum.ADMIN.name());
+    }
+
+    @Override
+    public FileDto createFile(UserDto userDto, Integer postId, FileDto fileDto, MultipartFile file, String text) {
+
+        final Post post = this.repo.findById(postId).orElseThrow(() -> new CapitalizeNotFoundException());
+
+        this.checkUserHasRightOrThrowForbidden(userDto, post,
+                Arrays.asList(ProfileEnum.ADMIN.name(), ProfileEnum.ARCHITECT.name()));
+        return this.fileService.updateFileContent(text, file, fileDto, post);
+
+    }
+
+    @Override
+    public FileDto updateFile(UserDto userDto, Integer postId, Integer fileId, FileDto fileDto, MultipartFile file,
+            String text) {
+        final Post post = this.repo.findById(postId).orElseThrow(() -> new CapitalizeNotFoundException());
+
+        this.checkUserHasRightOrThrowForbidden(userDto, post,
+                Arrays.asList(ProfileEnum.ADMIN.name(), ProfileEnum.ARCHITECT.name()));
+        if (!fileDto.getId().equals(fileId)) {
+            throw new CapitalizeBadRequestException();
+        }
+
+        return this.fileService.updateFileContent(text, file, fileDto, post);
+
+    }
+
+    @Override
+    public void checkUserHasRightOrThrowForbidden(UserDto user, Post post, List<String> overrides) {
+
+        if (overrides.contains(user.getProfile().getLabel())) {
+            return;
+        }
+        if (!post.getOwner().getId().equals(user.getId())) {
+            throw new CapitalizeForbiddenException(
+                    "User is not owner of the post nor has the right profile : [" + String.join(",", overrides) + "]");
+        }
     }
 
 }

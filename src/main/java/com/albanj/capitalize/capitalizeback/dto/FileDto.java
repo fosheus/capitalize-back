@@ -10,4 +10,14 @@ public class FileDto {
     private String name;
     private String type;
     // private String content;
+
+    public FileDto() {
+    }
+
+    public FileDto(Integer id, String path, String name, String type) {
+        this.id = id;
+        this.path = path;
+        this.name = name;
+        this.type = type;
+    }
 }

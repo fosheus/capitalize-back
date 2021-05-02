@@ -5,12 +5,16 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.albanj.capitalize.capitalizeback.dto.FileDto;
 import com.albanj.capitalize.capitalizeback.dto.PostDto;
+import com.albanj.capitalize.capitalizeback.dto.SimpleStringDto;
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
+import com.albanj.capitalize.capitalizeback.form.FileFormWrapper;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
 import com.albanj.capitalize.capitalizeback.service.PostService;
 import com.albanj.capitalize.capitalizeback.service.UserService;
+import com.albanj.capitalize.capitalizeback.validator.File.FileDtoValidation;
 import com.albanj.capitalize.capitalizeback.validator.groups.ValidationOnRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +22,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +32,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/posts")
 @Validated
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -76,18 +87,63 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public PostDto update(@PathVariable Integer id, @Valid @RequestBody PostForm post, BindingResult bindingResult)
-            throws Exception {
+    public PostDto update(Authentication authentication, @PathVariable Integer id, @Valid @RequestBody PostForm post,
+            BindingResult bindingResult) throws Exception {
         if (bindingResult.hasErrors()) {
             throw new CapitalizeBadRequestException();
         }
-        return postService.update(id, post);
+        UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
+
+        return postService.update(user, id, post);
     }
 
     @PatchMapping("/{id}/validate")
+    @PreAuthorize("hasAuthority('ARCHITECT') || hasAuthority('ADMIN')")
     public PostDto validate(Authentication authentication, @PathVariable Integer id) {
         UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
         return postService.validate(user, id);
+    }
+
+    @PostMapping("/{id}/files")
+    public FileDto createFile(Authentication authentication, @PathVariable Integer id,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile,
+            @RequestPart(value = "text", required = false) String text, @RequestPart("path") String path,
+            @RequestPart("name") String name, @RequestPart("type") String type) {
+        log.debug("createFile ");
+
+        FileDto fileDto = new FileDto(null, path, name, type);
+        UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
+
+        try {
+            return postService.createFile(user, id, fileDto, multipartFile, text);
+        } catch (Exception e) {
+            log.error("Erreur", e);
+            throw e;
+        }
+    }
+
+    @PutMapping("/{id}/files/{fileId}")
+    public FileDto updateFile(Authentication authentication, @PathVariable Integer id, @PathVariable Integer fileId,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile,
+            @RequestPart(value = "text", required = false) String text, @RequestPart("id") String fileIdForm,
+            @RequestPart("path") String path, @RequestPart("name") String name, @RequestPart("type") String type) {
+        log.debug("updateFile");
+        Integer fileIdParsed = Integer.parseInt(fileIdForm);
+        if (fileId.equals(fileIdParsed)) {
+            throw new CapitalizeBadRequestException();
+        }
+
+        FileDto fileDto = new FileDto(fileIdParsed, path, name, type);
+        UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
+
+        return postService.updateFile(user, id, fileId, fileDto, multipartFile, text);
+    }
+
+    @DeleteMapping("/{id}/files")
+    public void deleteFiles(Authentication authentication, @PathVariable Integer postId,
+            @RequestParam List<Integer> fileIds) {
+        UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
+        postService.deleteFile(user, postId, fileIds);
     }
 
 }

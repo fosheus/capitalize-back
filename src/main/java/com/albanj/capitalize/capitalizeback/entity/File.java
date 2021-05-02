@@ -8,7 +8,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(exclude = "post", callSuper = false)
 @Entity
 @Data
-public class File extends AbstractEntity{
+public class File extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,9 +17,12 @@ public class File extends AbstractEntity{
     private String name;
     @Column(nullable = false)
     private String path;
+    @Column(nullable = false)
     private String fullPath;
+    @Column(nullable = false)
     private String type;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
+
 }
