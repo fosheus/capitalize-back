@@ -1,27 +1,25 @@
 package com.albanj.capitalize.capitalizeback.validator.File;
 
-import com.albanj.capitalize.capitalizeback.dto.FileDto;
-import com.albanj.capitalize.capitalizeback.entity.File;
-import com.albanj.capitalize.capitalizeback.repository.FileRepository;
-import com.albanj.capitalize.capitalizeback.repository.PostRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 
 import javax.transaction.Transactional;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
+
+import com.albanj.capitalize.capitalizeback.dto.FileDto;
+import com.albanj.capitalize.capitalizeback.entity.File;
+import com.albanj.capitalize.capitalizeback.repository.FileRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class FileValidator implements ConstraintValidator<FileDtoValidation, FileDto> {
 
     private final FileRepository repo;
-    private final PostRepository postRepo;
 
     @Autowired
-    public FileValidator(FileRepository repo, PostRepository postRepo) {
+    public FileValidator(FileRepository repo) {
         this.repo = repo;
-        this.postRepo = postRepo;
     }
 
     @Override

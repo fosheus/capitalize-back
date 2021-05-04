@@ -1,20 +1,25 @@
 package com.albanj.capitalize.capitalizeback.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class CapitalizeBadRequestException extends RuntimeException {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6764762242158977060L;
+public class CapitalizeBadRequestException extends CapitalizeGenericException {
 
     public CapitalizeBadRequestException() {
+        super();
     }
 
-    public CapitalizeBadRequestException(String message) {
-        super(message);
+    public CapitalizeBadRequestException(Integer code, String text) {
+        super(code, text);
     }
+
+    public CapitalizeBadRequestException(Integer code, String text, Throwable t) {
+        super(code, text, t);
+    }
+
+    public CapitalizeBadRequestException(Integer code, String text, String message) {
+        super(code, text, message);
+    }
+
+    public CapitalizeBadRequestException(Integer code, String text, String message, Throwable t) {
+        super(code, text, message, t);
+    }
+
 }

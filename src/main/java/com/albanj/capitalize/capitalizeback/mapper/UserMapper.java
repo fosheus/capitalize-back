@@ -1,5 +1,8 @@
 package com.albanj.capitalize.capitalizeback.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.entity.ApplicationUser;
 import com.albanj.capitalize.capitalizeback.form.UserSignupForm;
@@ -52,5 +55,9 @@ public class UserMapper {
         user.setPassword(form.getPassword());
         user.setProfile(ProfileMapper.map(form.getProfile()));
         return user;
+    }
+
+    public static List<UserDto> map(List<ApplicationUser> users) {
+        return users.stream().map(UserMapper::map).collect(Collectors.toList());
     }
 }

@@ -18,6 +18,6 @@ public class UserSignupFormValidator implements ConstraintValidator<UserSignupFo
 
     @Override
     public boolean isValid(UserSignupForm userSignupForm, ConstraintValidatorContext context) {
-        return userService.getOneByEmailOrUsername(userSignupForm.getEmail(),userSignupForm.getUsername()) != null;
+        return userService.getOneByEmailOrUsername(userSignupForm.getEmail(), userSignupForm.getUsername()) == null;
     }
 }

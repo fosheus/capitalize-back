@@ -1,15 +1,25 @@
 package com.albanj.capitalize.capitalizeback.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value = HttpStatus.FORBIDDEN)
-public class CapitalizeForbiddenException extends RuntimeException {
+public class CapitalizeForbiddenException extends CapitalizeGenericException {
 
 	public CapitalizeForbiddenException() {
+		super();
 	}
 
-	public CapitalizeForbiddenException(String message) {
-		super(message);
+	public CapitalizeForbiddenException(Integer code, String text) {
+		super(code, text);
 	}
+
+	public CapitalizeForbiddenException(Integer code, String text, Throwable t) {
+		super(code, text, t);
+	}
+
+	public CapitalizeForbiddenException(Integer code, String text, String message) {
+		super(code, text, message);
+	}
+
+	public CapitalizeForbiddenException(Integer code, String text, String message, Throwable t) {
+		super(code, text, message, t);
+	}
+
 }

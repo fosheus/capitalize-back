@@ -1,7 +1,11 @@
 package com.albanj.capitalize.capitalizeback.resource;
 
+import java.util.List;
+
+import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,4 +19,10 @@ public class UserController {
     public UserController(UserService service) {
         this.service = service;
     }
+
+    @GetMapping("/")
+    public List<UserDto> list() {
+        return this.service.getAll();
+    }
+
 }

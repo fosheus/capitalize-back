@@ -16,4 +16,9 @@ public class UserSignupForm implements Serializable {
     private String username;
     private String password;
 
+    @Override
+    public String toString() {
+        return "email=" + email + "; username=" + username + "; password=[HIDDEN]";
+    }
+
 }
