@@ -9,9 +9,11 @@ FROM adoptopenjdk/openjdk11
 WORKDIR /opt/capitalize-back
 RUN addgroup --system spring && adduser --system spring --inGroup spring
 COPY --from=build /opt/capitalize-back/app.jar .
+RUN mkdir files
 RUN ["chown","-R","spring:spring","."]
-RUN ["chmod","+x","app.jar"]
+RUN ["chmod","+xrw","app.jar"]
 USER spring:spring
 VOLUME /var/log/capitalize/
 VOLUME /opt/capitalize-back/conf/
-ENTRYPOINT ["java","-jar","app.jar"]
+VOLUME /opt/capitalize-back/files/
+ENTRYPOINT ["java","${JAVA_OPTS} -Dspring.config.location=/opt/capitalize-back/conf/ -Dcapitalize.file.path=/opt/capitalize-back/files/","-jar","app.jar"]
