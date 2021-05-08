@@ -4,7 +4,6 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn install
 RUN find target -name *.jar | xargs -I {} -t mv {} app.jar
-RUN ls -l 
 
 FROM adoptopenjdk/openjdk11
 WORKDIR /opt/capitalize-back
@@ -14,4 +13,5 @@ RUN ["chown","-R","spring:spring","."]
 RUN ["chmod","+x","app.jar"]
 USER spring:spring
 VOLUME /var/log/capitalize/
+VOLUME /opt/capitalize-back/conf/
 ENTRYPOINT ["java","-jar","app.jar"]
