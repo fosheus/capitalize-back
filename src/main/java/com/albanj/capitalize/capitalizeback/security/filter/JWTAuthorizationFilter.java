@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import static com.albanj.capitalize.capitalizeback.security.SecurityConstants.*;
 
@@ -44,7 +45,17 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info("REQUEST START {} - {}", LogMessageBuilder.buildHeader(authentication), req.getRequestURL());
+        StringBuilder params = new StringBuilder();
+        int count = 0;
+        for (Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
+            if (count > 0) {
+                params.append(";");
+            }
+            params.append(entry.getKey() + "=[" + String.join(",", entry.getValue()) + "]");
+            count++;
+        }
+        log.info("REQUEST START {} - {} {} - params=[{}]", LogMessageBuilder.buildHeader(authentication),
+                req.getMethod(), req.getRequestURI(), params.toString());
         chain.doFilter(req, res);
         long end = System.currentTimeMillis();
         log.info("REQUEST END {} - {} - HTTP={} - {}ms", LogMessageBuilder.buildHeader(authentication),

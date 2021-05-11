@@ -4,7 +4,6 @@ import com.albanj.capitalize.capitalizeback.dto.UserDto;
 import com.albanj.capitalize.capitalizeback.enums.CapitalizeErrorEnum;
 import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
 import com.albanj.capitalize.capitalizeback.form.UserSignupForm;
-import com.albanj.capitalize.capitalizeback.log.LogMessageBuilder;
 import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -40,7 +39,6 @@ public class AuthenticationController {
 
     @GetMapping("/me")
     public UserDto me(Authentication authentication) {
-        log.info(LogMessageBuilder.buildHeader(authentication) + " me");
         return userService.getOneByEmailOrUsername(null, authentication.getName());
     }
 }

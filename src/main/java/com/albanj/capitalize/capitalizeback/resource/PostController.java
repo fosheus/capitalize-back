@@ -58,15 +58,12 @@ public class PostController {
     public List<PostDto> list(Authentication authentication, @RequestParam(required = false) List<String> tags,
             @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size)
             throws IOException {
-        log.info(LogMessageBuilder.buildHeader(authentication) + " list tags=[{}], page=[{}], size=[{}]",
-                tags != null ? String.join(",", tags) : "", page, size);
         return postService.getAll(page, size, tags);
     }
 
     @GetMapping("/{id}")
     public PostDto getOne(Authentication authentication, @PathVariable String id)
             throws IOException, CapitalizeBadRequestException, CapitalizeNotFoundException {
-        log.info(LogMessageBuilder.buildHeader(authentication) + " getOne id=[{}]", id);
         Integer idInt = null;
         try {
             idInt = Integer.parseInt(id);
@@ -82,16 +79,12 @@ public class PostController {
     public List<PostDto> listUnvalidated(Authentication authentication,
             @RequestParam(required = false) List<String> tags, @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) throws IOException {
-        log.info(LogMessageBuilder.buildHeader(authentication) + " listUnvalidated tags=[{}], page=[{}], size=[{}]",
-                tags != null ? String.join(",", tags) : "", page, size);
-
         return postService.getAll(page, size, tags);
     }
 
     @PostMapping()
     public PostDto create(Authentication authentication,
             @Validated(ValidationOnRequest.class) @RequestBody PostForm post) throws Exception {
-        log.info(LogMessageBuilder.buildHeader(authentication) + " create");
         UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
         return postService.create(user, post);
     }
@@ -99,7 +92,6 @@ public class PostController {
     @PutMapping("/{id}")
     public PostDto update(Authentication authentication, @PathVariable Integer id, @Valid @RequestBody PostForm post,
             BindingResult bindingResult) throws Exception {
-        log.info(LogMessageBuilder.buildHeader(authentication) + " update id={}", id);
         if (bindingResult.hasErrors()) {
             throw new CapitalizeBadRequestException();
         }
@@ -113,7 +105,6 @@ public class PostController {
     public PostDto validate(Authentication authentication, @PathVariable Integer id)
             throws CapitalizeNotFoundException {
         UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
-        log.info(LogMessageBuilder.buildHeader(authentication) + " update id={}", id);
 
         return postService.validate(user, id);
     }
@@ -124,8 +115,6 @@ public class PostController {
             @RequestPart(value = "text", required = false) String text, @RequestPart("path") String path,
             @RequestPart("name") String name, @RequestPart("type") String type) throws CapitalizeNotFoundException,
             CapitalizeForbiddenException, CapitalizeInternalException, CapitalizeBadRequestException {
-        log.debug("createFile ");
-
         FileDto fileDto = new FileDto(null, path, name, type);
         UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
         return postService.createFile(user, id, fileDto, multipartFile, text);
@@ -138,7 +127,6 @@ public class PostController {
             @RequestPart(value = "text", required = false) String text, @RequestPart("id") String fileIdForm,
             @RequestPart("path") String path, @RequestPart("name") String name, @RequestPart("type") String type)
             throws CapitalizeGenericException {
-        log.debug("updateFile");
         Integer fileIdParsed = Integer.parseInt(fileIdForm);
         if (fileId.equals(fileIdParsed)) {
             throw new CapitalizeBadRequestException();
