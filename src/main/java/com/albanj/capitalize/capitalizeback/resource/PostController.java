@@ -20,6 +20,7 @@ import com.albanj.capitalize.capitalizeback.service.UserService;
 import com.albanj.capitalize.capitalizeback.validator.groups.ValidationOnRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -55,10 +56,11 @@ public class PostController {
     }
 
     @GetMapping()
-    public List<PostDto> list(Authentication authentication, @RequestParam(required = false) List<String> tags,
-            @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size)
+    public Page<PostDto> list(Authentication authentication, @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) Integer pageIndex, @RequestParam(required = false) Integer pageSize,
+            @RequestParam(required = false) String owner, @RequestParam(required = false) Boolean unvalidated)
             throws IOException {
-        return postService.getAll(page, size, tags);
+        return postService.getAll(pageIndex, pageSize, tags, owner, unvalidated);
     }
 
     @GetMapping("/{id}")
@@ -72,14 +74,6 @@ public class PostController {
             throw new CapitalizeBadRequestException();
         }
         return postService.getOne(idInt);
-    }
-
-    @GetMapping("/unvalidated")
-    @PreAuthorize("hasAuthority('ARCHITECT')")
-    public List<PostDto> listUnvalidated(Authentication authentication,
-            @RequestParam(required = false) List<String> tags, @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) throws IOException {
-        return postService.getAll(page, size, tags);
     }
 
     @PostMapping()
@@ -107,6 +101,15 @@ public class PostController {
         UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
 
         return postService.validate(user, id);
+    }
+
+    @PatchMapping("/{id}/unvalidate")
+    @PreAuthorize("hasAuthority('ARCHITECT') || hasAuthority('ADMIN')")
+    public PostDto unvalidate(Authentication authentication, @PathVariable Integer id)
+            throws CapitalizeNotFoundException {
+        UserDto user = this.userService.getOneByEmailOrUsername(null, authentication.getName());
+
+        return postService.unvalidate(user, id);
     }
 
     @PostMapping("/{id}/files")

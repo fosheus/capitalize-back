@@ -8,6 +8,7 @@ import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class AuthenticationController {
         log.info("signup userSignupForm=[{}]", userSignupForm.toString());
         if (bindingResult.hasErrors()) {
             throw new CapitalizeBadRequestException(CapitalizeErrorEnum.SIGNUP_FORM_INVALID.code,
-                    CapitalizeErrorEnum.SIGNUP_FORM_INVALID.text, "Le modèle envoyé n'est pas valid");
+                    CapitalizeErrorEnum.SIGNUP_FORM_INVALID.text, "Le modèle envoyé n'est pas valide");
         }
         return userService.create(userSignupForm);
     }

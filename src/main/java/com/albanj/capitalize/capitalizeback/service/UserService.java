@@ -8,7 +8,7 @@ import com.albanj.capitalize.capitalizeback.form.UserSignupForm;
 
 public interface UserService {
 
-    List<UserDto> getAll();
+    List<UserDto> getAll(String username, Integer limit);
 
     UserDto create(UserSignupForm userSignupForm);
 

@@ -7,6 +7,7 @@ import com.albanj.capitalize.capitalizeback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,9 +21,10 @@ public class UserController {
         this.service = service;
     }
 
-    @GetMapping("/")
-    public List<UserDto> list() {
-        return this.service.getAll();
+    @GetMapping()
+    public List<UserDto> list(@RequestParam String username, @RequestParam String limit) {
+        Integer limitInt = Integer.parseInt(limit);
+        return this.service.getAll(username, limitInt);
     }
 
 }

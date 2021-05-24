@@ -14,18 +14,21 @@ public class ApplicationUser extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(unique = true, nullable = false)
     @Email
     @NotNull
     private String email;
+
     @Column(unique = true, nullable = false)
     @NotNull
     private String username;
+
     @NotNull
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {})
-    @JoinColumn(name = "profile_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
     @NotNull
     private RefProfile profile;
 }

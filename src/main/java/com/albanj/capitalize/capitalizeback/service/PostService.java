@@ -14,21 +14,23 @@ import com.albanj.capitalize.capitalizeback.exception.CapitalizeInternalExceptio
 import com.albanj.capitalize.capitalizeback.exception.CapitalizeNotFoundException;
 import com.albanj.capitalize.capitalizeback.form.PostForm;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PostService {
 
         PostDto getOne(Integer id) throws IOException, CapitalizeNotFoundException;
 
-        List<PostDto> getAllUnvalidated(Integer page, Integer size) throws IOException;
-
-        List<PostDto> getAll(Integer page, Integer size, List<String> tags) throws IOException;
+        Page<PostDto> getAll(Integer pageIndex, Integer pageSize, List<String> tags, String owner, Boolean unvalidated)
+                        throws IOException;
 
         PostDto create(UserDto userDto, PostForm post) throws Exception;
 
         PostDto update(UserDto userDto, Integer id, PostForm post) throws CapitalizeGenericException;
 
         PostDto validate(UserDto userDto, Integer id) throws CapitalizeNotFoundException;
+
+        PostDto unvalidate(UserDto userDto, Integer id) throws CapitalizeNotFoundException;
 
         FileDto createFile(UserDto userDto, Integer postId, FileDto fileDto, MultipartFile file, String text)
                         throws CapitalizeNotFoundException, CapitalizeForbiddenException, CapitalizeInternalException,

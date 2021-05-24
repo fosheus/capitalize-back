@@ -1,6 +1,7 @@
 package com.albanj.capitalize.capitalizeback.service.impl;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
@@ -15,7 +16,10 @@ import com.albanj.capitalize.capitalizeback.repository.ApplicationUserRepository
 import com.albanj.capitalize.capitalizeback.repository.ProfileRepository;
 import com.albanj.capitalize.capitalizeback.service.UserService;
 
+import org.h2.mvstore.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +41,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAll() {
-        // TODO Auto-generated method stub
-        return UserMapper.map(this.repo.findAll());
+    public List<UserDto> getAll(String username, Integer limit) {
+
+        if (username != null && username.length() > 0) {
+            PageRequest limitPage = PageRequest.of(0, limit);
+            return UserMapper.map(this.repo.findByUsernameStartsWithIgnoreCaseOrderByUsername(username, limitPage));
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -72,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getOneByEmailOrUsername(String email, String username) {
-        ApplicationUser user = repo.findByEmailOrUsername(email, username);
+        ApplicationUser user = repo.findByEmailOrUsernameAllIgnoreCase(email, username);
         return UserMapper.map(user);
     }
 

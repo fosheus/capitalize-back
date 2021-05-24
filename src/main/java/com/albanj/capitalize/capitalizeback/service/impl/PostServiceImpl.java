@@ -25,15 +25,14 @@ import com.albanj.capitalize.capitalizeback.repository.FileRepository;
 import com.albanj.capitalize.capitalizeback.repository.PostRepository;
 import com.albanj.capitalize.capitalizeback.service.FileService;
 import com.albanj.capitalize.capitalizeback.service.PostService;
+import com.albanj.capitalize.capitalizeback.utils.PageableUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -53,15 +52,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAll(Integer page, Integer size, List<String> tags) throws IOException {
+    public Page<PostDto> getAll(Integer pageIndex, Integer pageSize, List<String> tags, String owner,
+            Boolean unvalidated) throws IOException {
 
         Page<Post> posts = null;
-        if (CollectionUtils.isEmpty(tags)) {
-            posts = repo.findAll(getPageable(page, size, "updatedAt", false));
-        } else {
-            posts = repo.findAllByTags(getPageable(page, size, "updatedAt", false), tags);
-        }
-        return PostMapper.map(posts.getContent());
+        Pageable pageable = PageableUtils.getPageable(pageIndex, pageSize);
+        posts = repo.findAllByCriteria(tags, owner, unvalidated, pageable);
+
+        return new PageImpl<PostDto>(PostMapper.map(posts.getContent()), pageable, posts.getTotalElements());
     }
 
     @Override
@@ -72,12 +70,6 @@ public class PostServiceImpl implements PostService {
                         MessageFormat.format(CapitalizeErrorEnum.POST_NOT_FOUND.text, id),
                         MessageFormat.format("PostServiceImpl::getOne Post id={0} does not exist in database", id)));
         return PostMapper.map(post);
-    }
-
-    @Override
-    public List<PostDto> getAllUnvalidated(Integer page, Integer size) throws IOException {
-        List<Post> posts = repo.findByValidationDateNull(getPageable(page, size, "updatedAt", false));
-        return PostMapper.map(posts);
     }
 
     @Override
@@ -127,25 +119,16 @@ public class PostServiceImpl implements PostService {
         return PostMapper.map(repo.save(post));
     }
 
-    private Pageable getPageable(Integer page, Integer size, String sort, boolean ascending) {
-        if (page == null) {
-            page = 0;
-        }
-        if (size == null) {
-            size = 10;
-        }
-        Pageable pageable = null;
-        Sort sortBy = null;
-        if (sort != null && !sort.equals("")) {
-            sortBy = Sort.by(sort);
-            if (!ascending) {
-                sortBy.descending();
-            }
-            pageable = PageRequest.of(page, size, sortBy);
-        } else {
-            pageable = PageRequest.of(page, size);
-        }
-        return pageable;
+    @Override
+    public PostDto unvalidate(UserDto userDto, Integer id) throws CapitalizeNotFoundException {
+
+        Post post = repo.findById(id).orElseThrow(() -> new CapitalizeNotFoundException(
+                CapitalizeErrorEnum.POST_NOT_FOUND.code,
+                MessageFormat.format(CapitalizeErrorEnum.POST_NOT_FOUND.text, id),
+                MessageFormat.format("PostServiceImpl::unvalidate Post id={0} does not exist in database", id)));
+        post.setValidationDate(null);
+        post.setValidator(null);
+        return PostMapper.map(repo.save(post));
     }
 
     @Override

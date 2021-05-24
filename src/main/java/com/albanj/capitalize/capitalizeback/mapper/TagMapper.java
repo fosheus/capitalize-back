@@ -37,9 +37,15 @@ public class TagMapper {
         return dtos.stream().map(tag -> TagMapper.map(tag, post)).collect(Collectors.toSet());
     }
 
-    public static List<TagDto> map(Set<Tag> dtos) {
-        if (CollectionUtils.isEmpty(dtos))
+    public static List<TagDto> map(Set<Tag> entities) {
+        if (CollectionUtils.isEmpty(entities))
             return Collections.emptyList();
-        return dtos.stream().map(TagMapper::map).collect(Collectors.toList());
+        return entities.stream().map(TagMapper::map).collect(Collectors.toList());
+    }
+
+    public static List<TagDto> map(List<Tag> entities) {
+        if (CollectionUtils.isEmpty(entities))
+            return Collections.emptyList();
+        return entities.stream().map(TagMapper::map).collect(Collectors.toList());
     }
 }
