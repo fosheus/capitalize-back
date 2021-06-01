@@ -131,7 +131,7 @@ public class PostController {
             @RequestPart("path") String path, @RequestPart("name") String name, @RequestPart("type") String type)
             throws CapitalizeGenericException {
         Integer fileIdParsed = Integer.parseInt(fileIdForm);
-        if (fileId.equals(fileIdParsed)) {
+        if (!fileId.equals(fileIdParsed)) {
             throw new CapitalizeBadRequestException();
         }
 
