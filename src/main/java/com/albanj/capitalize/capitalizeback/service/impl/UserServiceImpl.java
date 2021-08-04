@@ -16,9 +16,7 @@ import com.albanj.capitalize.capitalizeback.repository.ApplicationUserRepository
 import com.albanj.capitalize.capitalizeback.repository.ProfileRepository;
 import com.albanj.capitalize.capitalizeback.service.UserService;
 
-import org.h2.mvstore.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

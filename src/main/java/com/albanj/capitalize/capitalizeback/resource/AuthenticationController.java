@@ -1,7 +1,6 @@
 package com.albanj.capitalize.capitalizeback.resource;
 
 import com.albanj.capitalize.capitalizeback.dto.UserDto;
-import com.albanj.capitalize.capitalizeback.enums.CapitalizeErrorEnum;
 import com.albanj.capitalize.capitalizeback.exception.CapitalizeBadRequestException;
 import com.albanj.capitalize.capitalizeback.form.UserSignupForm;
 import com.albanj.capitalize.capitalizeback.service.UserService;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
