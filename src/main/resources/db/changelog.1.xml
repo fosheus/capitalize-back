@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+    http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd " logicalFilePath="changelog.01">
+
+    <changeSet id="202201072026" author="Alban">
+        <insert tableName="ref_profile">
+            <column name="label" value="USER"/>
+        </insert>
+        <insert tableName="ref_profile">
+            <column name="label" value="ADMIN"/>
+        </insert>
+        <insert tableName="ref_profile">
+            <column name="label" value="ARCHITECT"/>
+        </insert>
+        <insert tableName="ref_tag_type">
+            <column name="label" value="LANGUAGE"/>
+        </insert>
+        <insert tableName="ref_tag_type">
+            <column name="label" value="FRAMEWORK"/>
+        </insert>
+        <insert tableName="ref_tag_type">
+            <column name="label" value="OTHER"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

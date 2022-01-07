@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd" logicalFilePath="master">
+    <changeSet author="aljub (generated)" id="1641581558627-1">
+        <createTable tableName="application_user">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="created_at" type="datetime(6)"/>
+            <column defaultValueComputed="NULL" name="updated_at" type="datetime(6)"/>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="NULL" name="password" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="NULL" name="profile_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-2">
+        <createTable tableName="file">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="created_at" type="datetime(6)"/>
+            <column defaultValueComputed="NULL" name="updated_at" type="datetime(6)"/>
+            <column defaultValue="NULL" name="full_path" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="NULL" name="type" type="VARCHAR(255)"/>
+            <column defaultValueComputed="NULL" name="post_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-3">
+        <createTable tableName="post">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="created_at" type="datetime(6)"/>
+            <column defaultValueComputed="NULL" name="updated_at" type="datetime(6)"/>
+            <column name="description" type="MEDIUMTEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="NULL" name="validation_date" type="datetime(6)"/>
+            <column defaultValueComputed="NULL" name="owner_id" type="INT"/>
+            <column defaultValueComputed="NULL" name="validator_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-4">
+        <createTable tableName="reaction">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="created_at" type="datetime(6)"/>
+            <column defaultValueComputed="NULL" name="updated_at" type="datetime(6)"/>
+            <column name="value" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-5">
+        <createTable tableName="ref_profile">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="label" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-6">
+        <createTable tableName="ref_tag_type">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="label" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-7">
+        <createTable tableName="tag">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="created_at" type="datetime(6)"/>
+            <column defaultValueComputed="NULL" name="updated_at" type="datetime(6)"/>
+            <column name="label" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="NULL" name="post_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-8">
+        <addUniqueConstraint columnNames="label, post_id" constraintName="IDX_TAG" tableName="tag"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-9">
+        <addUniqueConstraint columnNames="username" constraintName="UK_6c0v0rco93sykgyetukfmkkod" tableName="application_user"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-10">
+        <addUniqueConstraint columnNames="email" constraintName="UK_cb61p28hanadv7k0nx1ec0n5l" tableName="application_user"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-11">
+        <createIndex indexName="FK458s5krouat3r9nx2p0d2nijy" tableName="application_user">
+            <column name="profile_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-12">
+        <createIndex indexName="FK4iuyr19q3yyal42hssxxbo7wv" tableName="post">
+            <column name="owner_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-13">
+        <createIndex indexName="FK7tk5hi5tl1txftyn44dtq2mv6" tableName="tag">
+            <column name="post_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-14">
+        <createIndex indexName="FKjvkgfgriculfa68g0i8ysve1v" tableName="post">
+            <column name="validator_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-15">
+        <createIndex indexName="FKnm59rbv6qbowpdacbalxrud1e" tableName="file">
+            <column name="post_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-16">
+        <addForeignKeyConstraint baseColumnNames="profile_id" baseTableName="application_user" constraintName="FK458s5krouat3r9nx2p0d2nijy" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="ref_profile"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-17">
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="post" constraintName="FK4iuyr19q3yyal42hssxxbo7wv" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="application_user"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-18">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="tag" constraintName="FK7tk5hi5tl1txftyn44dtq2mv6" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="post"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-19">
+        <addForeignKeyConstraint baseColumnNames="validator_id" baseTableName="post" constraintName="FKjvkgfgriculfa68g0i8ysve1v" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="application_user"/>
+    </changeSet>
+    <changeSet author="aljub (generated)" id="1641581558627-20">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="file" constraintName="FKnm59rbv6qbowpdacbalxrud1e" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="post"/>
+    </changeSet>
+</databaseChangeLog>
