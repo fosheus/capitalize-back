@@ -23,33 +23,33 @@ import lombok.Data;
 @AllArgsConstructor
 public class PostSpecification implements Specification<Post> {
 
-	private List<String> tags;
-	private String owner;
-	private Boolean unvalidated;
+    private List<String> tags;
+    private String owner;
+    private Boolean validated;
 
-	@Override
-	public Predicate toPredicate(Root<Post> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-		Join<Post, Tag> joinTags = root.join("tags");
-		Join<Post, ApplicationUser> joinOwner = root.join("owner");
+    @Override
+    public Predicate toPredicate(Root<Post> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+        Join<Post, Tag> joinTags = root.join("tags");
+        Join<Post, ApplicationUser> joinOwner = root.join("owner");
 
-		List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>();
 
-		if (!CollectionUtils.isEmpty(tags)) {
-			predicates.add(builder.in(joinTags.get("label")).value(tags));
-		}
-		if (owner != null && !owner.equals("")) {
-			predicates.add(builder.like(joinOwner.get("username"), owner));
-		}
-		if (unvalidated != null) {
-			if (unvalidated.equals(Boolean.TRUE)) {
-				predicates.add(builder.isNull(root.get("validationDate")));
-			} else {
-				predicates.add(builder.isNotNull(root.get("validationDate")));
-			}
-		}
+        if (!CollectionUtils.isEmpty(tags)) {
+            predicates.add(builder.in(joinTags.get("label")).value(tags));
+        }
+        if (owner != null && !owner.equals("")) {
+            predicates.add(builder.like(joinOwner.get("username"), owner));
+        }
+        if (validated != null) {
+            if (validated.equals(Boolean.FALSE)) {
+                predicates.add(builder.isNull(root.get("validationDate")));
+            } else {
+                predicates.add(builder.isNotNull(root.get("validationDate")));
+            }
+        }
 
-		query.distinct(true);
-		return builder.and(predicates.toArray(new Predicate[0]));
-	}
+        query.distinct(true);
+        return builder.and(predicates.toArray(new Predicate[0]));
+    }
 
 }

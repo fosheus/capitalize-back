@@ -29,6 +29,6 @@ public interface PostRepository extends JpaRepository<Post, Integer>, JpaSpecifi
      * unvalidated, Pageable pageable);
      */
 
-    Page<Post> findAllByCriteria(List<String> tags, String owner, Boolean unvalidated, Pageable pageable);
+    Page<Post> findAllByCriteria(List<String> tags, String owner, Boolean validated, Pageable pageable);
 
 }

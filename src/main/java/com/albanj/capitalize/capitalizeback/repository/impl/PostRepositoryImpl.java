@@ -24,9 +24,9 @@ public class PostRepositoryImpl {
     @Autowired
     private PostRepository repo;
 
-    public Page<Post> findAllByCriteria(List<String> tags, String owner, Boolean unvalidated, Pageable pageable) {
+    public Page<Post> findAllByCriteria(List<String> tags, String owner, Boolean validated, Pageable pageable) {
 
-        Specification<Post> specification = new PostSpecification(tags, owner, unvalidated);
+        Specification<Post> specification = new PostSpecification(tags, owner, validated);
 
         return this.repo.findAll(specification, pageable);
     }

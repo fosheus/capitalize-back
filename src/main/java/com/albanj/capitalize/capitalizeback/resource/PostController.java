@@ -58,9 +58,10 @@ public class PostController {
     @GetMapping()
     public Page<PostDto> list(Authentication authentication, @RequestParam(required = false) List<String> tags,
             @RequestParam(required = false) Integer pageIndex, @RequestParam(required = false) Integer pageSize,
-            @RequestParam(required = false) String owner, @RequestParam(required = false) Boolean unvalidated)
+            @RequestParam(required = false) String owner,
+            @RequestParam(required = false, value = "status") Boolean validated)
             throws IOException {
-        return postService.getAll(pageIndex, pageSize, tags, owner, unvalidated);
+        return postService.getAll(pageIndex, pageSize, tags, owner, validated);
     }
 
     @GetMapping("/{id}")

@@ -53,11 +53,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDto> getAll(Integer pageIndex, Integer pageSize, List<String> tags, String owner,
-            Boolean unvalidated) throws IOException {
+            Boolean validated) throws IOException {
 
         Page<Post> posts = null;
         Pageable pageable = PageableUtils.getPageable(pageIndex, pageSize);
-        posts = repo.findAllByCriteria(tags, owner, unvalidated, pageable);
+        posts = repo.findAllByCriteria(tags, owner, validated, pageable);
 
         return new PageImpl<PostDto>(PostMapper.map(posts.getContent()), pageable, posts.getTotalElements());
     }
