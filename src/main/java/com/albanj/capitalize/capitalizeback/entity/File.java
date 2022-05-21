@@ -21,7 +21,7 @@ public class File extends AbstractEntity {
     private String fullPath;
     @Column(nullable = false)
     private String type;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

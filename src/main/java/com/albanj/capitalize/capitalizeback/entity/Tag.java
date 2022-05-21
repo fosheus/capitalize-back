@@ -16,7 +16,7 @@ public class Tag extends AbstractEntity {
     private Integer id;
     @Column(columnDefinition = "varchar(50)", nullable = false)
     private String label;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
